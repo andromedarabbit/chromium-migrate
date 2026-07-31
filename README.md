@@ -181,6 +181,8 @@ npm test
 npm run build
 ```
 
+A sample GitHub Actions workflow lives at [`docs/ci.yml.example`](./docs/ci.yml.example) (copy to `.github/workflows/ci.yml` if your token has the `workflow` scope).
+
 ---
 
 ## Contributing
