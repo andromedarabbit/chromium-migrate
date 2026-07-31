@@ -22,9 +22,12 @@
   },
   "files": [
     "dist",
+    "assets",
     "README.md",
     "LICENSE",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md"
   ],
   "engines": {
     "node": ">=22.0.0"

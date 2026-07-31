@@ -1,5 +1,9 @@
 # Contributing to chromium-migrate
 
+<p align="center">
+  <img src="assets/logo.png" alt="chromium-migrate" width="96" />
+</p>
+
 Thanks for helping make Chromium profile migration safer and more portable.
 
 ## Development setup
@@ -21,6 +25,7 @@ Requires **Node.js 22+**.
 - Keep migrators modular — one stage per concern.
 - Add unit/integration tests for new behavior.
 - Run `npm run typecheck` and `npm test` before opening a PR.
+- Keep brand assets as `assets/logo.png` and `assets/banner.png` (stable README URLs).
 
 ## Adding a browser
 
@@ -36,6 +41,12 @@ Requires **Node.js 22+**.
 - Keep PRs focused.
 - Describe the browsers/platforms you tested.
 - Do not commit `logs/`, `backups/`, `reports/`, or real profile data.
+- Use the PR template checklist.
+
+## Community
+
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Security policy](./SECURITY.md)
 
 ## Security
 

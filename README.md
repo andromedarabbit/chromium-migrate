@@ -1,79 +1,159 @@
-# chromium-migrate
+<p align="center">
+  <img src="assets/banner.png" alt="chromium-migrate — migrate Chromium browser profiles between browsers" width="100%" />
+</p>
 
-Open-source CLI to migrate **Chromium browser profiles** from one browser to another.
+<p align="center">
+  <img src="assets/logo.png" alt="chromium-migrate logo" width="120" />
+</p>
 
-Move bookmarks, history, passwords, cookies, extensions, autofill, sessions, permissions, and preferences between browsers such as:
+<h1 align="center">chromium-migrate</h1>
 
-**Chrome · Brave · Arc · Edge · Vivaldi · Opera · Opera GX · Chromium · Thorium · Dia**
+<p align="center">
+  <strong>Production-grade CLI to migrate Chromium browser profiles between browsers</strong><br />
+  Chrome · Brave · Arc · Edge · Vivaldi · Opera · Chromium · and more
+</p>
 
-> Engine: Chromium profile format · Runtime: Node.js 22+ · License: MIT
+<p align="center">
+  <a href="https://github.com/IshankDev/chromium-migrate/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/node-%3E%3D22-brightgreen.svg?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 22+" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.8-3178C6.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://github.com/IshankDev/chromium-migrate/stargazers"><img src="https://img.shields.io/github/stars/IshankDev/chromium-migrate?style=for-the-badge" alt="GitHub stars" /></a>
+  <a href="https://github.com/IshankDev/chromium-migrate/issues"><img src="https://img.shields.io/github/issues/IshankDev/chromium-migrate?style=for-the-badge" alt="Issues" /></a>
+</p>
+
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#supported-browsers">Browsers</a> ·
+  <a href="#cli">CLI</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#security">Security</a> ·
+  <a href="#contributing">Contributing</a>
+</p>
 
 ---
 
-## Why
+## Why chromium-migrate?
 
-Switching browsers usually means re-logging into everything and losing years of profile data. `chromium-migrate` copies Chromium profile databases and JSON, and on supported platforms re-encrypts passwords/cookies for the target browser’s Safe Storage key — without ever writing secrets to disk in plaintext.
+Switching browsers usually means weeks of friction: lost bookmarks, dead sessions, re-typing passwords, and hunting down extensions.
+
+**chromium-migrate** copies a full Chromium user profile from one browser to another — locally, safely, and verifiably.
+
+| | |
+| --- | --- |
+| **Safe by default** | Target profile is backed up before any write. Rollback in one command. |
+| **Secrets stay secret** | Passwords & cookies are re-encrypted in memory. Never logged. Never written plaintext. |
+| **Browser-agnostic** | Registry-driven paths for Chrome, Brave, Arc, Edge, Vivaldi, Opera, and more. |
+| **Production CLI** | Progress UI, dry-run estimates, JSON/Markdown/HTML reports, batched SQLite I/O. |
+
+```bash
+chromium-migrate migrate --from arc --to brave -y
+```
+
+---
+
+## Features
+
+| Capability | Details |
+| --- | --- |
+| Bookmarks | Full folder tree, order, dates; Arc sidebar favorites imported when source is Arc |
+| History & downloads | Large profiles (100k+ history rows) via batched SQLite |
+| Passwords | Keychain / Safe Storage re-encryption on macOS |
+| Cookies | Network/Cookies layout + encrypted value re-keying |
+| Autofill | Addresses, form history, masked card metadata |
+| Extensions | Packages + local/sync settings + compatibility notes |
+| Sessions | Current / Last Session & Tabs |
+| Permissions | Camera, mic, notifications, location, and more |
+| Preferences | Compatible Chromium prefs (theme, startup, search, zoom, …) |
+| Favicons / Top Sites | Databases copied and count-verified |
+| Dry-run | Item counts, disk estimate, unsupported surface list — zero writes |
+| Reports | JSON · Markdown · HTML under `reports/` |
+
+---
+
+## Supported browsers
+
+| ID | Browser | Notes |
+| --- | --- | --- |
+| `chrome` | Google Chrome | |
+| `chrome-canary` | Chrome Canary | |
+| `chromium` | Chromium | |
+| `brave` | Brave | |
+| `arc` | Arc | Spaces/Boosts not portable; sidebar → bookmarks |
+| `edge` | Microsoft Edge | |
+| `vivaldi` | Vivaldi | |
+| `opera` | Opera | |
+| `opera-gx` | Opera GX | |
+| `thorium` | Thorium | |
+| `dia` | Dia | Experimental |
+
+```bash
+chromium-migrate browsers    # paths for your OS
+chromium-migrate profiles    # installed profiles + sizes
+```
+
+Add another Chromium browser with a single entry in [`src/browsers/registry.ts`](./src/browsers/registry.ts).
 
 ---
 
 ## Install
+
+### Prerequisites
+
+- **Node.js 22+**
+- Build tools for native modules (`better-sqlite3`, `keytar`)
+- On macOS: Xcode Command Line Tools
 
 ```bash
 git clone https://github.com/IshankDev/chromium-migrate.git
 cd chromium-migrate
 npm install
 npm run build
-npm link   # exposes `chromium-migrate` and `cmigrate`
+npm link   # installs `chromium-migrate` and `cmigrate`
 ```
 
-Or run without linking:
-
 ```bash
-node dist/cli.js <command>
-npm run dev -- <command>
+# without linking
+node dist/cli.js --help
+npm run dev -- profiles
 ```
 
-### Native modules
-
-`better-sqlite3` and `keytar` need a working build toolchain:
-
 ```bash
-# macOS
-xcode-select --install
+# rebuild natives if install fails
 npm rebuild better-sqlite3 keytar
 ```
 
-The first password/cookie migration may prompt for OS keychain access — allow it.
+> The first password/cookie migration may prompt for OS keychain access — allow it for Safe Storage.
 
 ---
 
 ## Quick start
 
 ```bash
-# See what browsers/profiles exist
-chromium-migrate browsers
+# 1. Discover
 chromium-migrate profiles
 
-# Preview (no writes)
+# 2. Preview (no writes)
 chromium-migrate dry-run --from arc --to brave
 
-# Migrate
+# 3. Migrate (terminates browsers, backs up target)
 chromium-migrate migrate --from arc --to brave -y
 
-# Verify
+# 4. Verify
 chromium-migrate verify --from arc --to brave
 
-# Rollback target profile
+# 5. Something wrong? roll back
 chromium-migrate rollback
 ```
 
-### Examples
+### More examples
 
 ```bash
 chromium-migrate migrate --from chrome --to brave -y
-chromium-migrate migrate --from brave --to chrome --source-profile "Profile 1"
+chromium-migrate migrate --from brave --to edge --source-profile "Profile 1"
 chromium-migrate migrate --from edge --to vivaldi --no-passwords
-chromium-migrate dry-run --from arc --to chrome
+chromium-migrate dry-run --from opera --to chrome
+chromium-migrate backup create --browser brave -y
 ```
 
 ---
@@ -82,93 +162,89 @@ chromium-migrate dry-run --from arc --to chrome
 
 | Command | Description |
 | --- | --- |
-| `migrate` | Migrate profile `--from` → `--to` |
-| `verify` | Compare source/target counts |
-| `backup create/list` | Snapshot a profile before changes |
-| `rollback` | Restore a backup |
+| `migrate` | Migrate `--from` → `--to` |
+| `verify` | Compare source vs target counts |
+| `backup create` / `backup list` | Snapshot a profile |
+| `rollback [id]` | Restore the latest (or given) backup |
 | `dry-run` | Estimate without writing |
-| `profiles` | Discover installed browser profiles |
+| `profiles` | List discovered profiles |
 | `browsers` | List supported browsers + expected paths |
 | `report` | Show generated reports |
-| `clean` | Prune old backups/logs |
+| `clean` | Prune old backups / logs / reports |
 
-**Aliases:** `cmigrate`, and legacy `arc2brave` (same binary).
+**Binaries:** `chromium-migrate` · `cmigrate` · legacy `arc2brave`
 
-### Common flags
+### Flags
 
 | Flag | Description |
 | --- | --- |
 | `-f, --from <browser>` | Source browser id |
 | `-t, --to <browser>` | Target browser id |
 | `--source-profile` / `--target-profile` | Profile folder (default `Default`) |
-| `--no-passwords` / `--no-cookies` / … | Skip stages |
+| `--no-passwords` / `--no-cookies` / … | Skip individual stages |
 | `--skip-backup` | Skip target snapshot |
 | `-y, --terminate` | Quit browsers without prompting |
-| `-v, --verbose` | Debug logs |
-
----
-
-## Supported data
-
-| Data | Notes |
-| --- | --- |
-| Bookmarks | Folders, order, dates; Arc sidebar → bookmarks when source is Arc |
-| History / downloads | Full Chromium History DB |
-| Passwords | Re-encrypted on macOS (Keychain); copied as-is elsewhere |
-| Cookies | Re-encrypted on macOS; Network/Cookies layout handled |
-| Autofill | Addresses, form history, masked card metadata |
-| Extensions | Packages + local/sync settings |
-| Sessions / tabs | Current/Last Session files |
-| Permissions | Content-settings exceptions |
-| Preferences | Compatible Chromium prefs only |
-| Favicons / Top Sites | Databases copied |
-
-### Not portable
-
-Browser-specific UI (Arc Spaces/Boosts, Vivaldi panels, Opera workspaces), cloud sync sessions, full credit-card PANs.
+| `-v, --verbose` | Debug logging |
 
 ---
 
 ## Platform support
 
-| Platform | Profile discovery | DB copy | Password/cookie re-encrypt |
+| Platform | Discovery | DB copy | Password / cookie re-encrypt |
 | --- | --- | --- | --- |
-| macOS | ✅ | ✅ | ✅ (Keychain + AES-128-CBC) |
-| Linux | ✅ | ✅ | ⚠️ experimental via keytar / may copy blobs as-is |
-| Windows | ✅ paths | ✅ | ❌ DPAPI not yet implemented (blobs copied as-is) |
+| **macOS** | ✅ | ✅ | ✅ Keychain + AES-128-CBC |
+| **Linux** | ✅ | ✅ | ⚠️ via keytar; may copy blobs as-is |
+| **Windows** | ✅ | ✅ | ❌ DPAPI not yet — blobs copied as-is |
 
-Paths are resolved from a **browser registry** using `{home}` templates — nothing is hardcoded to a specific machine or username.
-
-Override data directories with:
+Paths use portable `{home}` templates — never hardcoded to a username or machine.
 
 ```bash
-export CHROMIUM_MIGRATE_HOME=/path/to/writable/workdir   # logs/backups/reports
+export CHROMIUM_MIGRATE_HOME=/path/to/workdir   # logs, backups, reports
 ```
 
 ---
 
 ## Architecture
 
-```
-src/
-  browsers/     Registry, discovery, process control
-  migration/    Stage migrators + orchestrator
-  services/     Backup + crypto / Safe Storage
-  database/     SQLite helpers (batched, transactional)
-  commands/     CLI (commander)
-  reports/      JSON / Markdown / HTML
+```mermaid
+flowchart LR
+  A[Source browser<br/>profile] --> B[Discovery & preflight]
+  B --> C[Backup target]
+  C --> D[Stage migrators]
+  D --> E[Re-encrypt secrets]
+  E --> F[Verify + reports]
+  F --> G[Target browser<br/>profile]
 ```
 
-Add a browser by editing `src/browsers/registry.ts` — no scattered hardcoding.
+```
+src/
+  browsers/     Registry · discovery · process control
+  migration/    Stage migrators · orchestrator · verify
+  services/     Backup · crypto / Safe Storage
+  database/     Batched transactional SQLite helpers
+  commands/     CLI (commander)
+  reports/      JSON / Markdown / HTML
+  utils/        Logging · progress UI · helpers
+```
 
 ---
 
-## Safety
+## Security
 
-1. Target profile is backed up under `backups/` before mutation (unless `--skip-backup`).
-2. Source and target browsers must be closed (`-y` to terminate).
-3. Secrets are decrypted only in memory for re-encryption — never logged or written plaintext.
-4. `rollback [backupId]` restores the previous target profile.
+chromium-migrate is designed for **local** migration of **your own** profiles.
+
+- Decrypt only in process memory for re-encryption
+- Never print, log, or persist plaintext passwords / cookie values
+- Redacted logging by default
+- Prefer quitting browsers cleanly before migrate
+
+See [SECURITY.md](./SECURITY.md) to report vulnerabilities privately.
+
+### Not portable
+
+- Browser-specific UI (Arc Spaces / Boosts, Vivaldi panels, Opera workspaces)
+- Cloud sync / account session state
+- Full credit-card PANs (masked / tokenized metadata only)
 
 ---
 
@@ -179,18 +255,42 @@ npm install
 npm run typecheck
 npm test
 npm run build
+npm run dev -- browsers
 ```
 
-A sample GitHub Actions workflow lives at [`docs/ci.yml.example`](./docs/ci.yml.example) (copy to `.github/workflows/ci.yml` if your token has the `workflow` scope).
+---
+
+## Roadmap
+
+- [ ] Windows DPAPI password/cookie re-encryption
+- [ ] Stronger Linux secret-service integration
+- [ ] Firefox → Chromium adapters (experimental)
+- [ ] npm package publish + Homebrew formula
+- [ ] Guided TUI mode
+
+Vote with 👍 on issues — PRs welcome.
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). Issues and PRs welcome — especially new browser definitions, Windows DPAPI support, and Linux secret-service hardening.
+We welcome browser definitions, platform crypto work, tests, and docs.
+
+1. Read [CONTRIBUTING.md](./CONTRIBUTING.md)
+2. Follow the [Code of Conduct](./CODE_OF_CONDUCT.md)
+3. Open a PR with clear test notes
+
+<p align="center">
+  <a href="https://github.com/IshankDev/chromium-migrate/stargazers">⭐ Star the repo</a>
+  if this saved you a weekend of re-logins.
+</p>
 
 ---
 
 ## License
 
-MIT © contributors
+[MIT](./LICENSE) © chromium-migrate contributors
+
+<p align="center">
+  <img src="assets/logo.png" alt="" width="64" />
+</p>

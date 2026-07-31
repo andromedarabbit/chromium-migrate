@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { pathToFileURL } from 'node:url';
 import { Command } from 'commander';
-import chalk from 'chalk';
 import { APP_NAME, APP_VERSION } from './types/index.js';
 import { listBrowserIds } from './browsers/registry.js';
 import { registerMigrateCommand } from './commands/migrate.js';
@@ -14,22 +13,20 @@ import { registerProfilesCommand } from './commands/profiles.js';
 import { registerCleanCommand } from './commands/clean.js';
 import { registerBrowsersCommand } from './commands/browsers.js';
 import { assertSupportedPlatform } from './utils/helpers.js';
+import { brandDescription, helpFooter, printSplash } from './utils/brand.js';
 
 export function buildProgram(): Command {
   const program = new Command();
 
   program
     .name(APP_NAME)
-    .description(
-      chalk.bold(
-        'Migrate Chromium browser profiles between browsers (Chrome, Brave, Arc, Edge, Vivaldi, …)',
-      ),
-    )
+    .description(brandDescription())
     .version(APP_VERSION)
-    .addHelpText(
-      'after',
-      `\nSupported browsers:\n  ${listBrowserIds().join(', ')}\n`,
-    )
+    .addHelpText('beforeAll', () => {
+      printSplash();
+      return '';
+    })
+    .addHelpText('after', helpFooter(listBrowserIds().join(', ')))
     .hook('preAction', () => {
       assertSupportedPlatform();
     });
@@ -49,6 +46,11 @@ export function buildProgram(): Command {
 
 export async function runCli(argv = process.argv): Promise<void> {
   const program = buildProgram();
+  // Bare invocation → help with splash
+  if (argv.length <= 2) {
+    program.outputHelp();
+    return;
+  }
   await program.parseAsync(argv);
 }
 

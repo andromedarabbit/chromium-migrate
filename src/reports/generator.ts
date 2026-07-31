@@ -142,29 +142,54 @@ export function renderHtml(report: MigrationReport): string {
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Migration Report ${escapeHtml(report.id)}</title>
+<title>Migration Report ${escapeHtml(report.id)} · chromium-migrate</title>
 <style>
-  :root { color-scheme: light; --bg:#f7f5f1; --ink:#1a1a1a; --accent:#fb542b; --ok:#1b7f4e; --warn:#9a6b00; --err:#b00020; }
-  body { font-family: "SF Pro Text", "Segoe UI", sans-serif; margin:0; background:var(--bg); color:var(--ink); }
-  main { max-width: 900px; margin: 2rem auto; padding: 0 1.25rem 3rem; }
-  h1 { font-size: 1.75rem; margin-bottom: .25rem; }
-  .meta { color:#555; margin-bottom: 1.5rem; }
-  .status { display:inline-block; padding:.2rem .6rem; border-radius:4px; font-weight:600; }
-  .status.ok { background:#d8f5e5; color:var(--ok); }
-  .status.bad { background:#fde2e7; color:var(--err); }
-  table { width:100%; border-collapse: collapse; background:#fff; margin:1rem 0 2rem; }
-  th, td { text-align:left; padding:.65rem .75rem; border-bottom:1px solid #e6e2db; }
-  th { background:#efebe4; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; }
-  .badge { font-size:.75rem; padding:.15rem .45rem; border-radius:3px; background:#eee; }
-  .badge.success { background:#d8f5e5; color:var(--ok); }
-  .badge.partial { background:#fff3cd; color:var(--warn); }
-  .badge.failed { background:#fde2e7; color:var(--err); }
+  :root {
+    color-scheme: dark;
+    --bg: #070b14;
+    --panel: #0f172a;
+    --ink: #e2e8f0;
+    --muted: #94a3b8;
+    --cyan: #00d1ff;
+    --purple: #a855f7;
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --err: #f87171;
+    --line: #1e293b;
+  }
+  body { font-family: "SF Pro Text", "Segoe UI", system-ui, sans-serif; margin:0; background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(0,209,255,.12), transparent),
+    radial-gradient(900px 500px at 90% 0%, rgba(168,85,247,.14), transparent),
+    var(--bg); color:var(--ink); }
+  main { max-width: 920px; margin: 2rem auto; padding: 0 1.25rem 3rem; }
+  .brand { display:flex; align-items:center; gap:.75rem; margin-bottom: 1.25rem; }
+  .brand img { width:40px; height:40px; border-radius:10px; }
+  .brand span { font-weight:700; letter-spacing:.02em; }
+  .brand span em { font-style:normal; color:var(--purple); }
+  h1 { font-size: 1.75rem; margin:0 0 .35rem; }
+  .meta { color:var(--muted); margin-bottom: 1.5rem; }
+  .status { display:inline-block; padding:.25rem .7rem; border-radius:999px; font-weight:600; font-size:.85rem; }
+  .status.ok { background:rgba(52,211,153,.15); color:var(--ok); border:1px solid rgba(52,211,153,.35); }
+  .status.bad { background:rgba(248,113,113,.12); color:var(--err); border:1px solid rgba(248,113,113,.35); }
+  table { width:100%; border-collapse: collapse; background:var(--panel); margin:1rem 0 2rem; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  th, td { text-align:left; padding:.7rem .85rem; border-bottom:1px solid var(--line); }
+  th { background:rgba(0,209,255,.06); font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; color:var(--cyan); }
+  .badge { font-size:.75rem; padding:.15rem .45rem; border-radius:999px; background:#1e293b; }
+  .badge.success { background:rgba(52,211,153,.15); color:var(--ok); }
+  .badge.partial { background:rgba(251,191,36,.12); color:var(--warn); }
+  .badge.failed { background:rgba(248,113,113,.12); color:var(--err); }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-bottom:.75rem; }
   .warn { color:var(--warn); } .err { color:var(--err); }
-  footer { margin-top:2rem; color:#777; font-size:.85rem; }
+  footer { margin-top:2rem; color:var(--muted); font-size:.85rem; }
+  a { color:var(--cyan); }
 </style>
 </head>
 <body>
 <main>
+  <div class="brand">
+    <img src="../assets/logo.png" alt="chromium-migrate" onerror="this.style.display='none'" />
+    <span>chromium<em>-migrate</em></span>
+  </div>
   <h1>Migration Report</h1>
   <p class="meta">${escapeHtml(report.source.browser)} → ${escapeHtml(report.target.browser)} · ${escapeHtml(report.id)}</p>
   <p>
@@ -189,7 +214,7 @@ export function renderHtml(report: MigrationReport): string {
       ? `<h2>Warnings</h2><ul class="warn">${report.warnings.map((w) => `<li>${escapeHtml(w)}</li>`).join('')}</ul>`
       : ''
   }
-  <footer>Generated ${escapeHtml(nowIso())} by chromium-migrate<br/><pre style="display:none">${escapeHtml(mdish)}</pre></footer>
+  <footer>Generated ${escapeHtml(nowIso())} by <a href="https://github.com/IshankDev/chromium-migrate">chromium-migrate</a><br/><pre style="display:none">${escapeHtml(mdish)}</pre></footer>
 </main>
 </body>
 </html>`;
