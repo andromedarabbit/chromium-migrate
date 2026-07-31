@@ -1,0 +1,14 @@
+export { BaseMigrator } from './base.js';
+export type { MigratorContext } from './base.js';
+export { BookmarksMigrator } from './bookmarks.js';
+export { HistoryMigrator, DownloadsMigrator } from './history.js';
+export { PasswordsMigrator } from './passwords.js';
+export { CookiesMigrator } from './cookies.js';
+export { AutofillMigrator } from './autofill.js';
+export { ExtensionsMigrator } from './extensions.js';
+export { SessionsMigrator } from './sessions.js';
+export { PermissionsMigrator } from './permissions.js';
+export { PreferencesMigrator } from './preferences.js';
+export { FaviconsMigrator, TopSitesMigrator } from './favicons.js';
+export { MigrationOrchestrator } from './orchestrator.js';
+export { verifyMigration } from './verify.js';
