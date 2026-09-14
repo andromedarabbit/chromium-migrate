@@ -14,7 +14,8 @@ export type BrowserId =
   | 'opera'
   | 'opera-gx'
   | 'thorium'
-  | 'dia';
+  | 'dia'
+  | 'aside';
 
 export interface SafeStorageConfig {
   service: string;
@@ -317,6 +318,27 @@ export const BROWSER_REGISTRY: Record<BrowserId, BrowserDefinition> = {
       },
     },
     notes: ['Dia support is experimental'],
+  },
+  aside: {
+    id: 'aside',
+    displayName: 'Aside',
+    family: 'chromium',
+    processNames: {
+      darwin: ['Aside'],
+    },
+    bundleIds: ['at.studio.AsideBrowser'],
+    userDataPaths: {
+      // Aside nests nothing — data root is flat (no User Data subdir)
+      darwin: [home('Library', 'Application Support', 'Aside')],
+    },
+    safeStorage: {
+      darwin: {
+        service: 'Aside Safe Storage',
+        account: 'Aside',
+        fallbacks: ['Chrome Safe Storage', 'Chromium Safe Storage'],
+      },
+    },
+    notes: ['Aside support is experimental'],
   },
 };
 

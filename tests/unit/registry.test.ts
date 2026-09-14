@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import path from 'node:path';
 import {
   resolveBrowserId,
   getBrowserDefinition,
@@ -19,6 +20,7 @@ describe('browser registry', () => {
     expect(ids).toContain('brave');
     expect(ids).toContain('arc');
     expect(ids).toContain('edge');
+    expect(ids).toContain('aside');
   });
 
   it('expands home path templates without hardcoding a user', () => {
@@ -32,5 +34,13 @@ describe('browser registry', () => {
 
   it('rejects unknown browsers', () => {
     expect(() => resolveBrowserId('netscape')).toThrow(/Unknown browser/);
+  });
+
+  it('aside data root is flat (no User Data nesting)', () => {
+    const def = getBrowserDefinition('aside');
+    const [template] = def.userDataPaths.darwin ?? [];
+    expect(template).toContain('{home}');
+    expect(template).toContain(path.join('Application Support', 'Aside'));
+    expect(template).not.toContain('User Data');
   });
 });
