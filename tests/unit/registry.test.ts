@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
   resolveBrowserId,
@@ -19,6 +20,7 @@ describe('browser registry', () => {
     expect(ids).toContain('brave');
     expect(ids).toContain('arc');
     expect(ids).toContain('edge');
+    expect(ids).toContain('ego-lite');
   });
 
   it('expands home path templates without hardcoding a user', () => {
@@ -32,5 +34,13 @@ describe('browser registry', () => {
 
   it('rejects unknown browsers', () => {
     expect(() => resolveBrowserId('netscape')).toThrow(/Unknown browser/);
+  });
+
+  it('ego lite user-data root lives under the Citro Labs namespace', () => {
+    const def = getBrowserDefinition('ego-lite');
+    const [template] = def.userDataPaths.darwin ?? [];
+    expect(template).toContain('{home}');
+    expect(template).toContain(path.join('Application Support', 'Citro Labs', 'ego lite'));
+    expect(def.safeStorage.darwin?.service).toBe('ego safe storage');
   });
 });
