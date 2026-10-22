@@ -15,7 +15,8 @@ export type BrowserId =
   | 'opera-gx'
   | 'thorium'
   | 'dia'
-  | 'aside';
+  | 'aside'
+  | 'ego-lite';
 
 export interface SafeStorageConfig {
   service: string;
@@ -339,6 +340,27 @@ export const BROWSER_REGISTRY: Record<BrowserId, BrowserDefinition> = {
       },
     },
     notes: ['Aside support is experimental'],
+  },
+  'ego-lite': {
+    id: 'ego-lite',
+    displayName: 'ego lite',
+    family: 'chromium',
+    processNames: {
+      darwin: ['ego lite'],
+    },
+    bundleIds: ['com.citrolabs.ego.lite'],
+    userDataPaths: {
+      darwin: [home('Library', 'Application Support', 'Citro Labs', 'ego lite')],
+    },
+    safeStorage: {
+      darwin: {
+        // live-verified: ego deviates from the "<name> Safe Storage" convention
+        service: 'ego safe storage',
+        account: 'ego',
+        fallbacks: ['Chrome Safe Storage', 'Chromium Safe Storage'],
+      },
+    },
+    notes: ['ego lite support is experimental', 'Windows support pending verification'],
   },
 };
 

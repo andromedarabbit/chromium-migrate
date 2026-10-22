@@ -25,3 +25,4 @@ tmp/
 *.sqlite
 *.sqlite3
 !tests/fixtures/**/*
+.serena/

@@ -87,6 +87,7 @@ chromium-migrate migrate --from arc --to brave -y
 | `thorium` | Thorium | |
 | `dia` | Dia | Experimental |
 | `aside` | Aside | Experimental |
+| `ego-lite` | ego lite | Experimental |
 
 ```bash
 chromium-migrate browsers    # paths for your OS
